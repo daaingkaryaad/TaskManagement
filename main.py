@@ -3,34 +3,36 @@ import json
 import os
 from datetime import datetime, date
 from PyQt5.QtWidgets import (
-
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QListWidget, QLineEdit, QTextEdit, QMessageBox, QDateEdit
-
 )
 
-
 class TaskBase:
-    #Base class for tasks, description, sorting by deadline
+    #our base class for tasks, description, sorting by deadline
 
     def __init__(self, title, description, deadline=None, timestamp=None):
         self.title = title
         self.description = description
         self.timestamp = timestamp if timestamp else datetime.now().isoformat()
-        self.deadline = deadline if deadline else None  # Store as string (YYYY-MM-DD)
+        self.deadline = deadline if deadline else None  #to store as string (YYYY-MM-DD)
 
     def update(self, new_title=None, new_description=None, new_deadline=None):
-        """Updates task details and refreshes timestamp."""
+
+        #update task details and refreshes timestamp
+
         if new_title:
             self.title = new_title
         if new_description:
             self.description = new_description
         if new_deadline:
             self.deadline = new_deadline
-        self.timestamp = datetime.now().isoformat()  # Refresh timestamp
+        self.timestamp = datetime.now().isoformat()  #to refresh timestamp
+
 
     def to_dict(self):
-        """Convert task to dictionary for saving to JSON."""
+
+        #to convert task to dictionary for saving to json
+
         return {
             "title": self.title,
             "description": self.description,
@@ -40,28 +42,35 @@ class TaskBase:
 
     @staticmethod
     def from_dict(data):
-        """Create a Task object from dictionary data."""
+
+        #to create a Task object from dictionary data
+
         return Task(
             data["title"],
             data["description"],
-            data.get("deadline"),  # Get deadline or None
+            data.get("deadline"),  #to get deadline
             data.get("timestamp", datetime.now().isoformat())
         )
 
     def __str__(self):
-        """Format task display in list."""
+
+        #format task display in list
+
         formatted_time = datetime.fromisoformat(self.timestamp).strftime("%Y-%m-%d %H:%M:%S")
         deadline_display = f" | Deadline: {self.deadline}" if self.deadline else ""
         return f"{self.title} - {self.description}{deadline_display} (Last Modified: {formatted_time})"
 
 
 class Task(TaskBase):
-    """A standard task that inherits from TaskBase."""
-    pass  # No extra modifications, just inherits everything
+
+    #standard task that inherits from TaskBase
+
+    pass  #just inherits everything
 
 
 class TaskManager:
-    """Manages tasks and file storage."""
+
+    #to manage tasks and to file storage
 
     FILE_PATH = "tasks.json"
 
@@ -70,81 +79,98 @@ class TaskManager:
         self.load_tasks()
 
     def add_task(self, title, description, deadline):
-        """Adds a new task with a deadline."""
+
+        #adds a new task with a deadline
+
         task = Task(title, description, deadline)
         self.tasks.append(task)
         self.save_tasks()
 
     def update_task(self, index, new_title, new_description, new_deadline):
-        """Updates an existing task and refreshes timestamp."""
+
+        #to update an existing task and refresh timestamp
+
         if 0 <= index < len(self.tasks):
             self.tasks[index].update(new_title, new_description, new_deadline)
             self.save_tasks()
 
     def delete_task(self, index):
-        """Deletes a task."""
+
+        #to delete a task
+
         if 0 <= index < len(self.tasks):
             self.tasks.pop(index)
             self.save_tasks()
 
     def get_task_list(self):
-        """Returns the task list as strings."""
+
+        #to return the task list as strings
+
         return [str(task) for task in self.tasks]
 
     def search_tasks(self, keyword):
-        """Search tasks that match the keyword (case-insensitive)."""
+
+        #search tasks that match the word (keyword)
+
         keyword = keyword.lower()
         return [str(task) for task in self.tasks if keyword in task.title.lower() or keyword in task.description.lower()]
 
     def save_tasks(self):
-        """Saves tasks to a JSON file."""
+
+        #Saves tasks to a json file
+
         with open(self.FILE_PATH, "w") as file:
             json.dump([task.to_dict() for task in self.tasks], file, indent=4)
 
     def load_tasks(self):
-        """Loads tasks from a JSON file if it exists."""
+
+        #to load tasks from existing json file
+
         if os.path.exists(self.FILE_PATH):
             with open(self.FILE_PATH, "r") as file:
                 try:
                     tasks_data = json.load(file)
                     self.tasks = [TaskBase.from_dict(task) for task in tasks_data]
                 except json.JSONDecodeError:
-                    self.tasks = []  # If file is corrupted, reset tasks
+                    self.tasks = []  #reset tasks in case of corruption
 
     def sort_tasks_by_deadline(self):
-        """Sorts tasks based on their deadline (earliest first, overdue first)."""
+
+        #to sort tasks based on their deadline (earliest/overdue first)
+
         self.tasks.sort(
             key=lambda task: datetime.strptime(task.deadline, "%Y-%m-%d") if task.deadline else datetime.max
         )
 
 
 class TaskManagerGUI(QWidget):
-    """Main GUI for Task Manager using PyQt5."""
+
+    #main GUI for Task Manager, we used PyQt5
 
     def __init__(self):
         super().__init__()
 
         self.task_manager = TaskManager()
 
-        # Window setup
+        #window setup
         self.setWindowTitle("Task Manager")
         self.setGeometry(100, 100, 600, 500)
 
-        # Layout
+        #layout
         layout = QVBoxLayout()
 
-        # Search Bar
+        #search bar
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search tasks...")
         self.search_input.textChanged.connect(self.search_tasks)
         layout.addWidget(self.search_input)
 
-        # Task List
+        #task list
         self.task_list = QListWidget()
         self.load_tasks_into_list()
         layout.addWidget(self.task_list)
 
-        # Input Fields
+        #input fields
         self.title_input = QLineEdit()
         self.title_input.setPlaceholderText("Enter task title")
         layout.addWidget(self.title_input)
@@ -153,12 +179,12 @@ class TaskManagerGUI(QWidget):
         self.description_input.setPlaceholderText("Enter task description")
         layout.addWidget(self.description_input)
 
-        # Deadline Selection
+        #deadline setup
         self.deadline_input = QDateEdit()
         self.deadline_input.setCalendarPopup(True)
         layout.addWidget(self.deadline_input)
 
-        # Buttons Layout
+        #buttons layout
         button_layout = QHBoxLayout()
 
         add_button = QPushButton("Add Task")
@@ -179,18 +205,22 @@ class TaskManagerGUI(QWidget):
 
         layout.addLayout(button_layout)
 
-        # Set layout
+        #set layout
         self.setLayout(layout)
 
     def load_tasks_into_list(self, filtered_tasks=None):
-        """Load tasks into the list widget."""
+
+        # to load tasks into the list widget
+
         self.task_list.clear()
         tasks_to_display = filtered_tasks if filtered_tasks is not None else self.task_manager.get_task_list()
         for task in tasks_to_display:
             self.task_list.addItem(task)
 
     def search_tasks(self):
-        """Search and filter tasks based on user input."""
+
+        #to search and filter tasks based on user input
+
         keyword = self.search_input.text().strip()
         if keyword:
             filtered_tasks = self.task_manager.search_tasks(keyword)
@@ -199,7 +229,9 @@ class TaskManagerGUI(QWidget):
             self.load_tasks_into_list()
 
     def add_task(self):
-        """Adds a new task with a deadline."""
+
+        #to add a new task with a deadline
+
         title = self.title_input.text().strip()
         description = self.description_input.toPlainText().strip()
         deadline = self.deadline_input.date().toString("yyyy-MM-dd")
@@ -213,7 +245,9 @@ class TaskManagerGUI(QWidget):
             QMessageBox.warning(self, "Input Error", "Both title and description are required.")
 
     def update_task(self):
-        """Updates the selected task."""
+
+        #to update the selected task
+
         selected_index = self.task_list.currentRow()
         if selected_index != -1:
             new_title = self.title_input.text().strip()
@@ -226,7 +260,9 @@ class TaskManagerGUI(QWidget):
             QMessageBox.warning(self, "Selection Error", "Select a task to update.")
 
     def delete_task(self):
-        """Deletes the selected task."""
+
+        #to delete the selected task
+
         selected_index = self.task_list.currentRow()
         if selected_index != -1:
             self.task_manager.delete_task(selected_index)
@@ -235,7 +271,9 @@ class TaskManagerGUI(QWidget):
             QMessageBox.warning(self, "Selection Error", "Select a task to delete.")
 
     def sort_by_deadline(self):
-        """Sort tasks by deadline."""
+
+        #sort tasks by deadline
+
         self.task_manager.sort_tasks_by_deadline()
         self.load_tasks_into_list()
 
