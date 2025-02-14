@@ -1,0 +1,32 @@
+[
+    {
+        "title": "Calculus assignment",
+        "description": "Consists of 27 tasks, 3 per 9 topics.",
+        "deadline": null,
+        "timestamp": "2025-02-14T12:33:17.617439"
+    },
+    {
+        "title": "ITP C++ assignment",
+        "description": "Contester week 9",
+        "deadline": null,
+        "timestamp": "2025-02-14T12:33:41.638522"
+    },
+    {
+        "title": "Computer Engineering Seminar",
+        "description": "Atrium at 12",
+        "deadline": null,
+        "timestamp": "2025-02-14T12:34:31.662349"
+    },
+    {
+        "title": "Finals",
+        "description": "All finals will be finished",
+        "deadline": "2025-02-26",
+        "timestamp": "2025-02-14T13:03:58.726936"
+    },
+    {
+        "title": "Discrete math final",
+        "description": "Tasks should be completed",
+        "deadline": "2025-03-13",
+        "timestamp": "2025-02-14T13:04:44.941644"
+    }
+]
